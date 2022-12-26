@@ -8,4 +8,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #we doesn't use the Flask-S
 db = SQLAlchemy(app)
 ma = Marshmallow(app) # Needs to inicialized after SQLAlchemy.
 
-from database import routes # Needs to be after the app initialization. 
+app.app_context().push()
+
+# Needs to be after the app initialization.
+from database import routes
