@@ -1,51 +1,52 @@
-from database import app
-from flask import jsonify
+from database import app, db, ma
+from flask import jsonify, request
 
 @app.route("/")
 @app.route("/home")
 def index():
     return jsonify({"hello":"World"})
 
-@app.route("/carrito")
-def carrito():
-    return "<p>carrito</p>"
+@app.route('/get_item/<id>', methods = ['GET'])
+def get_item(id):
+    item = db.Item.query.get(id)
+    return ma.item_schema.jsonify(item), 200
 
-@app.route("/crearusuario")
-def crear_usuario():
-    return "crear usuario"
+@app.route('/get_items', methods = ['GET'])
+def get_items():
+    all_items = db.Item.query.all()
+    results = ma.items_schema.dump(all_items)
+    return jsonify(results), 200
 
-@app.route("/perfildelusuario")
-def perfil_usuario():
-    return "perfil del usuario"
+@app.route('/add_item', methods = ['POST'])
+def add_item():
+    name = request.json['name']
+    price = request.json['price']
+    description = request.json['description']
+    stock = request.json['stock']
+    image = request.json['image']
 
-@app.route("/dadospersonales")
-def dados_personales():
-    return "dados del usuario"
+    new_item = db.Item(name=name, price=price, description=description, stock=stock, image=image)
 
-@app.route("/misproductos")
-def mis_productos():
-    return "mis productos"
+    db.session.add(new_item)
+    db.session.commit()
 
-@app.route("/registrarproducto")
-def registrar_producto():
-    return "registrar producto"
+    return ma.item_schema.jsonify(new_item), 201
 
-@app.route("/editarproducto")
-def editar_producto():
-    return "editar producto"
+@app.route('/update_item/<id>', methods = ['PUT'])
+def update_item(id):
+    item = db.Item.query.get(id)
 
-@app.route("/teladeproducto")
-def tela_producto():
-    return "tela producto" 
+    name = request.json['name']
+    price = request.json['price']
+    description = request.json['description']
+    stock = request.json['stock']
+    image = request.json['image']
 
-@app.route("/sobrenosotros")
-def sobre_nosotros():
-    return "sobre nosotros"
+    item.name=name
+    item.price=price 
+    item.description=description
+    item.stock=stock
+    item.image=image
 
-@app.route("/contactanosostros")
-def contacta_nosotros():
-    return "contacta con nosotros"
-
-@app.route("/admin")
-def admin():
-    return "admin"
+    db.session.commit()
+    return ma.item_schema.jsonify(item), 201

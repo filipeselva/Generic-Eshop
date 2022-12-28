@@ -8,8 +8,14 @@ class OrderItem(db.Model):
     amount = db.Column(db.Integer(), nullable=False)
 
     def __repr__(self):
-        return f'Item. {self.id}'
+        return f'OrderItem. {self.id}'
 
+    def __init__(self, id, item_id, item_price, amount):
+        self.id = id
+        self.item_id = item_id
+        self.item_price = item_price
+        self.amount = amount
+        
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(120), nullable=False, unique=True)
@@ -23,7 +29,18 @@ class User(db.Model):
     orders = db.relationship('Order', backref='user', lazy=True)
 
     def __repr__(self):
-        return f'Item. {self.id}'
+        return f'User. {self.id}'
+
+    def __init__(self, id, username, email_address, password_hash, adress,
+    postal_code, mobile):
+        self.id = id
+        self.username = username
+        self.email_address = email_address
+        self.password_hash = password_hash
+        self.adress = adress
+        self.postal_code = postal_code
+        self.mobile = mobile
+
 
 class Item(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -33,9 +50,22 @@ class Item(db.Model):
     stock = db.Column(db.Integer(), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     order_item_id = db.Column(db.Integer(), db.ForeignKey('order_item.id'))
+    image = db.Column(db.BLOB(), nullable=False)
 
     def __repr__(self):
         return f'Item. {self.name}'
+
+    def __init__(self, id, name, price, description, stock, date_created,
+     order_item_id, image):
+        self.id = id
+        self.name = name
+        self.price = price
+        self.description = description
+        self.stock = stock
+        self.date_created = date_created
+        self.order_item_id = order_item_id
+        self.image = image
+        
 
 class Order(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -46,4 +76,13 @@ class Order(db.Model):
     status = db.Column(db.Integer(), nullable=False)
 
     def __repr__(self):
-        return f'Item. {self.id}'
+        return f'Order. {self.id}'
+
+    def __init__(self, id, date_created, total, user_id, order_items,
+    status):
+        self.id = id
+        self.date_created = date_created
+        self.total = total
+        self.user_id = user_id
+        self.order_items = order_items
+        self.status = status
