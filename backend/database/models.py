@@ -1,11 +1,16 @@
 from datetime import datetime
 from database import db
+from uuid import uuid4
+
+def get_uuid():
+    return uuid4().hex
 
 class OrderItem(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.String(32), unique=True, primary_key=True, default=get_uuid())
     item_id = db.Column(db.Integer(), db.ForeignKey('item.id'))
     item_price = db.Column(db.Integer(), nullable=False)
     amount = db.Column(db.Integer(), nullable=False)
+    order_id = db.Column(db.Integer(), db.ForeignKey('order.id'))
 
     def __repr__(self):
         return f'OrderItem. {self.id}'
@@ -17,7 +22,7 @@ class OrderItem(db.Model):
         self.amount = amount
         
 class User(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.String(32), unique=True, primary_key=True, default=get_uuid())
     username = db.Column(db.String(120), nullable=False, unique=True)
     email_address = db.Column(db.String(60), nullable=False, unique=True)
     password_hash = db.Column(db.String(60), nullable=False)
@@ -43,7 +48,7 @@ class User(db.Model):
 
 
 class Item(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.String(32), unique=True, primary_key=True, default=get_uuid())
     name = db.Column(db.String(120), nullable=False, unique=True)
     price = db.Column(db.Integer(), nullable=False)
     description = db.Column(db.String(400), nullable=False)
@@ -68,21 +73,21 @@ class Item(db.Model):
         
 
 class Order(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.String(32), unique=True, primary_key=True, default=get_uuid())
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     total = db.Column(db.Integer(), nullable=False)
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
-    order_items = db.relationship('OrderItem', backref='order', lazy=True)
+    order_itens = db.relationship('OrderItem', backref='order', lazy=True)
     status = db.Column(db.Integer(), nullable=False)
 
     def __repr__(self):
         return f'Order. {self.id}'
 
-    def __init__(self, id, date_created, total, user_id, order_items,
+    def __init__(self, id, date_created, total, user_id, order_itens,
     status):
         self.id = id
         self.date_created = date_created
         self.total = total
         self.user_id = user_id
-        self.order_items = order_items
+        self.order_itens = order_itens
         self.status = status
