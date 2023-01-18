@@ -78,12 +78,12 @@ def register_user():
     if user_exists:
         return jsonify({"error": "User already exists"}), 409
 
-    new_user = models.User(id = id, username = username, email_address = email_address, password_hash = password_hash, adress = adress, postal_code = postal_code, mobile = mobile)
+    else:
+        new_user = models.User(id = id, username = username, email_address = email_address, password_hash = password_hash, adress = adress, postal_code = postal_code, mobile = mobile)
     
-    db.session.add(new_user)
-    db.session.commit()
-    db.session.remove()
-
+        db.session.add(new_user)
+        db.session.commit()
+        
     return serializers.user_schema.jsonify(new_user), 201
 
 @app.route('/get_user/<id>', methods = ['GET'])
